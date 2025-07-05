@@ -1,0 +1,278 @@
+
+Custom css for the spreadsheet
+.handsontable-container {
+  --ht-color-primary: #2563eb;
+  --ht-color-secondary: #f1f5f9;
+  --ht-color-border: #e2e8f0;
+  --ht-color-text: #1e293b;
+  --ht-color-header-bg: #f8fafc;
+  --ht-color-header-text: #64748b;
+}
+
+/* Header texts */
+.handsontable-container .colHeader,
+.handsontable-container .rowHeader {
+  background-color: var(--ht-color-header-bg);
+  color: var(--ht-color-header-text);
+  font-weight: 500;
+  font-size: 12px;
+  border-bottom: 1px solid var(--ht-color-border);
+  border-right: 1px solid var(--ht-color-border);
+}
+
+/*Row header text*/
+.handsontable-container .rowHeader {
+  width: 100%;
+  text-align: center;
+  background-color: var(--ht-color-header-bg);
+  color: var(--ht-color-header-text);
+  font-size: 11px;
+}
+
+/* Cell styling */
+.handsontable-container td {
+  background-color: white;
+  border-right: 1px solid #f1f5f9;
+  border-bottom: 1px solid #f1f5f9;
+  padding: 8px 12px;
+  vertical-align: middle;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.handsontable-container tr:first-child td{
+  border-top:1px solid #f1f5f9 ;
+
+}
+.handsontable-container tr:first-child th{
+  border-top:1px solid #f1f5f9 ;
+
+}
+
+.handsontable-container th,
+.handsontable-container .relative
+ {
+  background-color: white;
+  border-right: 1px solid #f1f5f9;
+  border-bottom: 1px solid #f1f5f9;
+  padding: 8px 12px;
+  vertical-align: middle;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.handsontable-container td.htDimmed {
+  color: #94a3b8;
+}
+
+
+/* Status badges */
+.handsontable-container .status-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: center;
+  min-width: 80px;
+  
+}
+/* Top headers */
+.handsontable-container .Q3{
+  background-color: #e2e2e2;
+}
+.handsontable-container .ABC{
+  background-color: #d2e0d4;
+
+}
+.handsontable-container .AAQ{
+  background-color: #dccffc;
+}
+.handsontable-container .Extract{
+  background-color: #fac2af;
+}
+
+
+.handsontable-container .status-in-process {
+  background-color: #fff3d6;
+  color: #84640a;
+}
+
+.handsontable-container .status-need-to-start {
+  background-color: #f1f5f9;
+  color: #64748b;
+}
+
+.handsontable-container .status-complete {
+  background-color: #d2f2e2;
+  color: #0a6d3c;
+}
+
+.handsontable-container .status-blocked {
+  background-color: #ffe1dd;
+  color: #c12119;
+}
+
+/* Priority colors */
+.handsontable-container .priority-high {
+  color: #ef4c43;
+  font-weight: 500;
+}
+
+.handsontable-container .priority-medium {
+  color: #c1920f;
+  font-weight: 500;
+
+}
+
+.handsontable-container .priority-low {
+  color: #1a8cff;
+  font-weight: 500;
+}
+
+/* URL styling */
+.handsontable-container .url-cell {
+  color: black;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.handsontable-container .url-cell:hover {
+  color: #1d4ed8;
+}
+
+
+.handsontable-container .ht__selection--area {
+  background-color: rgba(37, 99, 235, 0.1);
+  border: 2px solid #2563eb;
+}
+
+.handsontable-container .ht__selection--area-corner {
+  background-color: #2563eb;
+  border: 1px solid #2563eb;
+}
+
+.handsontable-container .htDropdownMenu {
+  border: 1px solid var(--ht-color-border);
+  border-radius: 6px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.handsontable-container .htDropdownMenu .ht_master .wtTable {
+  border: none;
+}
+
+.handsontable-container .htDropdownMenuItemWrapper {
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+.handsontable-container .htDropdownMenuItemWrapper:hover {
+  background-color: #f1f5f9;
+}
+
+.handsontable-container .htContextMenu {
+  border: 1px solid var(--ht-color-border);
+  border-radius: 6px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.handsontable-container .wtHider {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+.handsontable-container .wtHider::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.handsontable-container .wtHider::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+.handsontable-container .wtHider::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 4px;
+}
+
+.handsontable-container .wtHider::-webkit-scrollbar-thumb:hover {
+  background-color: #94a3b8;
+}
+
+.handsontable-container .changeType {
+  display: none;
+}
+
+.handsontable-container .columnSorting {
+  position: relative;
+}
+
+.handsontable-container .columnSorting:after {
+
+  position: absolute; 
+  right: 4px;
+  top: 50%; 
+   transform: translateY(-50%);
+   width: 0;
+  height: 0;
+  border-left: 3px solid transparent;
+  border-right: 3px solid transparent;
+  border-bottom: 3px solid #94a3b8;
+
+}
+
+.handsontable-container .columnSorting.ascending:after {
+  border-bottom: 3px solid #2563eb;
+  border-top: none;
+}
+
+.handsontable-container .columnSorting.descending:after {
+  border-top: 3px solid #2563eb;
+  border-bottom: none;
+}
+
+/* Add column button styling */
+.handsontable-container .add-column-btn {
+  background: #f1f5f9 !important;
+  /* border: 1px dashed #94a3b8 !important; */
+  border-radius: 4px !important;
+  padding: 4px 8px !important;
+  cursor: pointer !important;
+  font-size: 16px !important;
+  color: #64748b !important;
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s ease !important;
+}
+
+.handsontable-container .add-column-btn:hover {
+  background: #e2e8f0 !important;
+  border-color: #64748b !important;
+  color: #475569 !important;
+}
+
+/* Hide empty rows styling */
+.handsontable-container tr.empty-row {
+  display: none;
+}
+
+/* Ensure proper spacing for 100 rows */
+.handsontable-container .wtHolder {
+  max-height: 850px;
+  overflow-y: auto;
+}
+
+/* '+' header button styling */
+.handsontable-container .colHeader:nth-child(2) {
+  cursor: pointer ;
+  font-size: 14px ;
+  color: #64748b ; 
+  width: 100%;
+  text-align: left ; 
+  transition: all 2s ease ;
+  user-select: none ;
+}
+
