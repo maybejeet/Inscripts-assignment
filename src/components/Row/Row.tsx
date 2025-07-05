@@ -47,6 +47,7 @@ import {
     const [showToolbar, setShowToolbar] = useState(true);
     const [filterDialogOpen, setFilterDialogOpen] = useState(false);
     const [shareDialogOpen, setShareDialogOpen] = useState(false);
+    const { state } = useData();
   
     const toolbarActions = [
       { 
@@ -118,7 +119,7 @@ import {
 
 
     return (
-      <header className="flex items-center justify-between gap-2 px-2 py-1.5 w-full bg-white border-b border-[#eeeeee] z-[2]">
+      <header className="flex items-center justify-between gap-2 px-2 py-1.5 w-full bg-white border-b border-[#eeeeee] relative z-[5000] shadow-sm">
         <div className="flex gap-2 items-center">
         <Button
           variant="ghost"
@@ -148,12 +149,13 @@ import {
                         </span>
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent>
+                    <DropdownMenuContent className="z-[9999] bg-white border border-gray-200 shadow-lg rounded-md min-w-[160px]">
                       {action.label === "Hide fields" && fieldOptions.map((field) => (
                         <DropdownMenuCheckboxItem
                           key={field}
                           checked={!hiddenFields.includes(field)}
                           onCheckedChange={() => onToggleField(field)}
+                          className="px-3 py-2 text-sm hover:bg-gray-50 cursor-pointer"
                         >
                           {field}
                         </DropdownMenuCheckboxItem>
@@ -162,16 +164,16 @@ import {
                         <DropdownMenuItem
                           key={option.key}
                           onClick={() => onSort(option.key)}
-                          className="bg-amber-700 z-[20000] "
+                          className="px-3 py-2 text-sm hover:bg-gray-50 cursor-pointer"
                         >
                           {option.label}
                         </DropdownMenuItem>
                       ))}
                       {action.label === "Cell view" && (
                         <>
-                          <DropdownMenuItem>Grid view</DropdownMenuItem>
-                          <DropdownMenuItem>List view</DropdownMenuItem>
-                          <DropdownMenuItem>Card view</DropdownMenuItem>
+                          <DropdownMenuItem className="px-3 py-2 text-sm hover:bg-gray-50 cursor-pointer">Grid view</DropdownMenuItem>
+                          <DropdownMenuItem className="px-3 py-2 text-sm hover:bg-gray-50 cursor-pointer">List view</DropdownMenuItem>
+                          <DropdownMenuItem className="px-3 py-2 text-sm hover:bg-gray-50 cursor-pointer">Card view</DropdownMenuItem>
                         </>
                       )}
                     </DropdownMenuContent>
@@ -218,11 +220,11 @@ import {
                   </span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => onExport('csv')}>
+              <DropdownMenuContent className="z-[9999] bg-white border border-gray-200 shadow-lg rounded-md min-w-[160px]">
+                <DropdownMenuItem onClick={() => onExport('csv')} className="px-3 py-2 text-sm hover:bg-gray-50 cursor-pointer">
                   Export as CSV
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => onExport('json')}>
+                <DropdownMenuItem onClick={() => onExport('json')} className="px-3 py-2 text-sm hover:bg-gray-50 cursor-pointer">
                   Export as JSON
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -240,7 +242,7 @@ import {
                   </span>
                 </Button>
               </DialogTrigger>
-              <DialogContent>
+              <DialogContent className="z-[9999]">
                 <DialogHeader>
                   <DialogTitle>Share Spreadsheet</DialogTitle>
                 </DialogHeader>
@@ -272,7 +274,7 @@ import {
           </Button>
         </div> 
         <Dialog open={filterDialogOpen} onOpenChange={setFilterDialogOpen}>
-          <DialogContent>
+          <DialogContent className="z-[9999]">
             <DialogHeader>
               <DialogTitle>Filter Data</DialogTitle>
             </DialogHeader>

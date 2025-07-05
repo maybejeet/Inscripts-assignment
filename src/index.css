@@ -7,3 +7,29 @@
 body {
     font-family: 'Inter', sans-serif;
 }
+
+/* Ensure dropdowns appear above Handsontable elements */
+[data-radix-popper-content-wrapper] {
+    z-index: 9999 !important;
+}
+
+/* Additional z-index overrides for dropdown menus */
+.radix-dropdown-content,
+[role="menu"],
+[role="dialog"] {
+    z-index: 9999 !important;
+}
+
+/* Ensure Handsontable doesn't interfere with dropdowns */
+.handsontable-container {
+    z-index: 1;
+}
+
+.handsontable .htCore {
+    z-index: 1;
+}
+
+.handsontable .colHeader,
+.handsontable .rowHeader {
+    z-index: 2;
+}

@@ -214,7 +214,7 @@ const Spreadsheet: React.FC<SpreadsheetProps> = ({ onDataChange }) => {
   }, [extraColumns, statusRenderer, urlRenderer, priorityRenderer,addColumnRenderer]);
 
   return (
-    <div className='h-[872px] min-w-full overflow-auto'>
+    <div className='h-[872px] min-w-full overflow-auto relative z-[1]'>
       <HotTable
         ref={hotTableRef}
         data={hotData}
