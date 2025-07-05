@@ -34,6 +34,7 @@ import {
     onExport: (format: 'csv' | 'json') => void;
     onAddNew: () => void;
     hiddenFields: string[];
+    state?: any;
   }
   
   export const Row = ({
@@ -43,11 +44,15 @@ import {
     onExport,
     onAddNew,
     hiddenFields,
+    state
   }: DataRowSectionProps): JSX.Element => {
     const [showToolbar, setShowToolbar] = useState(true);
     const [filterDialogOpen, setFilterDialogOpen] = useState(false);
     const [shareDialogOpen, setShareDialogOpen] = useState(false);
-    const { state } = useData();
+    
+    // Use internal data if state is not provided
+    const internalData = useData();
+    const currentState = state || internalData.state;
   
     const toolbarActions = [
       { 
@@ -76,6 +81,7 @@ import {
       },
     ];
   
+    // Dynamic field options based on data structure
     const fieldOptions = [
       'Job Request',
       'Submitted',
@@ -88,13 +94,26 @@ import {
       'Est. Value'
     ];
   
+    // Dynamic sort options based on data structure
     const sortOptions = [
       { label: 'Job Request', key: 'title' },
       { label: 'Submitted Date', key: 'submittedDate' },
       { label: 'Status', key: 'status' },
+      { label: 'Submitter', key: 'submitter' },
+      { label: 'Assigned', key: 'assigned' },
       { label: 'Priority', key: 'priority' },
       { label: 'Due Date', key: 'dueDate' },
+      { label: 'Est. Value', key: 'estValue' },
     ];
+
+    // Get unique values from data for filter options
+    const getUniqueValues = (key: keyof typeof currentState.data[0]) => {
+      return [...new Set(currentState.data.map(item => item[key]))].filter(Boolean);
+    };
+
+    const statusOptions = getUniqueValues('status');
+    const priorityOptions = getUniqueValues('priority');
+    const submitterOptions = getUniqueValues('submitter');
   
     const handleImport = () => {
       const input = document.createElement('input');
@@ -284,12 +303,12 @@ import {
                 <select 
                   className="w-full px-3 py-2 border rounded-md"
                   onChange={(e) => onFilter({ status: e.target.value })}
+                  defaultValue={currentState.filters.status || ""}
                 >
                   <option value="">All Statuses</option>
-                  <option value="In-process">In-process</option>
-                  <option value="Need to start">Need to start</option>
-                  <option value="Complete">Complete</option>
-                  <option value="Blocked">Blocked</option>
+                  {statusOptions.map((status) => (
+                    <option key={status} value={status}>{status}</option>
+                  ))}
                 </select>
               </div>
               <div>
@@ -297,12 +316,44 @@ import {
                 <select 
                   className="w-full px-3 py-2 border rounded-md"
                   onChange={(e) => onFilter({ priority: e.target.value })}
+                  defaultValue={currentState.filters.priority || ""}
                 >
                   <option value="">All Priorities</option>
-                  <option value="High">High</option>
-                  <option value="Medium">Medium</option>
-                  <option value="Low">Low</option>
+                  {priorityOptions.map((priority) => (
+                    <option key={priority} value={priority}>{priority}</option>
+                  ))}
                 </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">Submitter</label>
+                <select 
+                  className="w-full px-3 py-2 border rounded-md"
+                  onChange={(e) => onFilter({ submitter: e.target.value })}
+                  defaultValue={currentState.filters.submitter || ""}
+                >
+                  <option value="">All Submitters</option>
+                  {submitterOptions.map((submitter) => (
+                    <option key={submitter} value={submitter}>{submitter}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex gap-2 pt-4">
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    onFilter({ status: '', priority: '', submitter: '' });
+                    setFilterDialogOpen(false);
+                  }}
+                  className="flex-1"
+                >
+                  Clear Filters
+                </Button>
+                <Button 
+                  onClick={() => setFilterDialogOpen(false)}
+                  className="flex-1 bg-[#4b6a4f] hover:bg-[#3e5741]"
+                >
+                  Apply
+                </Button>
               </div>
             </div>
           </DialogContent>

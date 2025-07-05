@@ -13,6 +13,7 @@ function App() {
     filterData,
     toggleFieldVisibility,
     exportData,
+    addNewRow,
   } = useData();
 
 
@@ -33,8 +34,22 @@ function App() {
   };
 
   const handleAddNew = () => {
-    // TODO: Add new row functionality
-    console.log('Add new row');
+    // TODO: Implement add new row dialog
+    console.log('Add new row - implement dialog');
+    // For now, you could add a sample row:
+    // addNewRow({
+    //   title: "New Job Request",
+    //   submittedDate: new Date().toLocaleDateString('en-GB'),
+    //   status: "Need to start",
+    //   statusColor: "bg-slate-200 text-slate-600",
+    //   submitter: "Current User",
+    //   url: "www.example.com",
+    //   assigned: "Unassigned",
+    //   priority: "Medium",
+    //   priorityColor: "text-[#c1920f]",
+    //   dueDate: "",
+    //   estValue: "0",
+    // });
   };
 
 
@@ -48,8 +63,9 @@ function App() {
           onExport={handleExport}
           onAddNew={handleAddNew}
           hiddenFields={state.hiddenFields}
+          state={state}
       />
-      <Spreadsheet/>
+      <Spreadsheet state={state} hiddenFields={state.hiddenFields} />
       <TitleRow/>
     </>
   )

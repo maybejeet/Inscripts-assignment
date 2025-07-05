@@ -10,7 +10,23 @@ import { useRef, useCallback, useEffect, useState } from 'react';
 import { useData } from '../../hooks/useData';
 import { BriefcaseBusiness } from 'lucide-react';
 
+//fieldMapping
+
 registerAllModules();
+
+// Define field mapping outside component to prevent re-creation
+const fieldMapping = {
+  'Job Request': 0,
+  'Submitted': 1,
+  'Status': 2,
+  'Submitter': 3,
+  'URL': 4,
+  'Assigned': 5,
+  'Priority': 6,
+  'Due Date': 7,
+  'Est. Value': 8
+};
+
 interface JobRequest {
   id: number;
   title: string;
@@ -27,13 +43,17 @@ interface JobRequest {
 }
 interface SpreadsheetProps {
   onDataChange?: (data: JobRequest[]) => void;
+  state?: any;
+  hiddenFields?: string[];
 }
 
-const Spreadsheet: React.FC<SpreadsheetProps> = ({ onDataChange }) => {
+const Spreadsheet: React.FC<SpreadsheetProps> = ({ onDataChange, state: externalState, hiddenFields = [] }) => {
   const hotTableRef = useRef<HotTable>(null);
-  const { state } = useData();
+  const internalData = useData();
+  const state = externalState || internalData.state;
   const [hotData, setHotData] = useState<(string | number)[][]>([]);
   const [extraColumns, setExtraColumns] = useState<string[]>([]);
+
 
   const handleAddColumn = useCallback(() => {
     const newColumnName = `Custom ${extraColumns.length + 1}`;
@@ -45,23 +65,32 @@ const Spreadsheet: React.FC<SpreadsheetProps> = ({ onDataChange }) => {
   }, [extraColumns.length]);
 
   const convertToHotData = useCallback((data: JobRequest[]) => {
-    const totalColumns = 13 + extraColumns.length + 1; 
-    
     const convertedData = data.map(item => {
-      const baseRow = [
-        item.title,           // Job Request
-        item.submittedDate,   // Submitted
-        item.status,          // Status
-        item.submitter,       // Submitter
-        item.url,            // URL
-        item.assigned,       // Assigned
-        item.priority,       // Priority
-        item.dueDate,        // Due Date
-        item.estValue        // Est. Value
+      const allFields = [
+        item.title,           // Job Request - 0
+        item.submittedDate,   // Submitted - 1
+        item.status,          // Status - 2
+        item.submitter,       // Submitter - 3
+        item.url,            // URL - 4
+        item.assigned,       // Assigned - 5
+        item.priority,       // Priority - 6
+        item.dueDate,        // Due Date - 7
+        item.estValue        // Est. Value - 8
       ];
+      
+      // Filter out hidden fields
+      const visibleFields = allFields.filter((field, index) => {
+        const fieldName = Object.keys(fieldMapping).find(key => fieldMapping[key as keyof typeof fieldMapping] === index);
+        return !hiddenFields.includes(fieldName || '');
+      });
+      
       const extraCells = new Array(extraColumns.length).fill('');
-      return [...baseRow, ...extraCells];
+      return [...visibleFields, ...extraCells];
     });
+    
+    // Calculate visible columns count
+    const visibleColumnsCount = Object.keys(fieldMapping).filter(field => !hiddenFields.includes(field)).length;
+    const totalColumns = visibleColumnsCount + extraColumns.length + 1; // +1 for add button
     
     const emptyRowsNeeded = Math.max(0, 100 - convertedData.length);
     for (let i = 0; i < emptyRowsNeeded; i++) {
@@ -69,7 +98,7 @@ const Spreadsheet: React.FC<SpreadsheetProps> = ({ onDataChange }) => {
     }
     
     return convertedData;
-  }, [extraColumns.length]);
+  }, [extraColumns.length, hiddenFields]);
 
   useEffect(() => {
     const newHotData = convertToHotData(state.filteredData);
@@ -157,50 +186,56 @@ const Spreadsheet: React.FC<SpreadsheetProps> = ({ onDataChange }) => {
 
 
 
-  //TODO: fix add btn
-  const getColumnSettings = useCallback(() => {
 
+  const getColumnSettings = useCallback(() => {
     const baseSettings = [
-      { BriefcaseBusiness ,data: 0, type: 'text', width: 300 }, // Job Request (Title)
-      { data: 1, type: 'text', width: 120 }, // Submitted Date
+      { data: 0, type: 'text', width: 300, title: 'Job Request' }, // Job Request (Title)
+      { data: 1, type: 'text', width: 120, title: 'Submitted' }, // Submitted Date
       { 
         data: 2, 
         type: 'dropdown', 
         source: ['In-process', 'Need to start', 'Complete', 'Blocked'],
         renderer: statusRenderer,
-        width: 125 
+        width: 125,
+        title: 'Status'
       }, // Status
-      { data: 3, type: 'text', width: 150 }, // Submitter
+      { data: 3, type: 'text', width: 150, title: 'Submitter' }, // Submitter
       { 
         data: 4, 
         type: 'text', 
         renderer: urlRenderer,
-        width: 150 
+        width: 150,
+        title: 'URL'
       }, // URL
-      { data: 5, type: 'text', width: 150 }, // Assigned
+      { data: 5, type: 'text', width: 150, title: 'Assigned' }, // Assigned
       { 
         data: 6, 
         type: 'dropdown', 
         source: ['High', 'Medium', 'Low'],
         renderer: priorityRenderer,
-        width: 100 
+        width: 100,
+        title: 'Priority'
       }, // Priority
-      { data: 7, type: 'text', width: 120 }, // Due Date
-      { data: 8, type: 'text', width: 100,  }, // Extract
-      { data: 9, type: 'text', width: 120 }, // Est. Value
+      { data: 7, type: 'text', width: 120, title: 'Due Date' }, // Due Date
+      { data: 8, type: 'text', width: 120, title: 'Est. Value' }, // Est. Value
     ];
+
+    // Filter out hidden columns
+    const visibleSettings = baseSettings.filter((setting, index) => {
+      const fieldName = Object.keys(fieldMapping).find(key => fieldMapping[key as keyof typeof fieldMapping] === index);
+      return !hiddenFields.includes(fieldName || '');
+    });
 
     //Add settings for extra columns
     const extraSettings = extraColumns.map((_, index) => ({
-      data: baseSettings.length + index,
+      data: visibleSettings.length + index,
       type: 'text',
       width: 120
     }));
 
-  //   // Add (+) button column
-    
-  const addButtonSetting = {
-      data: baseSettings.length + extraColumns.length,
+    // Add (+) button column
+    const addButtonSetting = {
+      data: visibleSettings.length + extraColumns.length,
       type: 'text',
       renderer: addColumnRenderer,
       readOnly: true,
@@ -208,10 +243,11 @@ const Spreadsheet: React.FC<SpreadsheetProps> = ({ onDataChange }) => {
     };
 
     return [
-      ...baseSettings,
-        ...extraSettings,
-      addButtonSetting];
-  }, [extraColumns, statusRenderer, urlRenderer, priorityRenderer,addColumnRenderer]);
+      ...visibleSettings,
+      ...extraSettings,
+      addButtonSetting
+    ];
+  }, [extraColumns, statusRenderer, urlRenderer, priorityRenderer, addColumnRenderer, hiddenFields]);
 
   return (
     <div className='h-[872px] min-w-full overflow-auto relative z-[1]'>
@@ -220,10 +256,50 @@ const Spreadsheet: React.FC<SpreadsheetProps> = ({ onDataChange }) => {
         data={hotData}
         // colHeaders={columnHeaders}
         colHeaders={true}
-        nestedHeaders={[
-          [{label: 'Q3 Financial Overview', colspan: 4, headerClassName: "Q3"},{label:"",headerClassName:"blank",colspan:1},{label:'ABC', headerClassName:'ABC', colspan:1},{label: "Answer a question", colspan:2, headerClassName:'AAQ'}, {label:'Extract',colspan:1,headerClassName:"Extract"},'+' ],
-          ['Job Request', 'Submitted', 'Status', 'Submitter', 'URL', 'Assigned', 'Priority', 'Due Date',      'Est. Value']
-        ]}
+        nestedHeaders={(() => {
+          const allHeaders = ['Job Request', 'Submitted', 'Status', 'Submitter', 'URL', 'Assigned', 'Priority', 'Due Date', 'Est. Value'];
+          const visibleHeaders = allHeaders.filter(header => !hiddenFields.includes(header));
+          const extraHeaders = extraColumns.map((_, index) => `Custom ${index + 1}`);
+          
+          const topRowHeaders = [];
+          let currentIndex = 0;
+          
+          // Q3 Financial Overview (covers first 4 visible columns)
+          const firstGroupCount = Math.min(4, visibleHeaders.length);
+          if (firstGroupCount > 0) {
+            topRowHeaders.push({label: 'Q3 Financial Overview', colspan: firstGroupCount, headerClassName: "Q3"});
+            currentIndex += firstGroupCount;
+          }
+          
+          // Add remaining headers based on what's visible
+          const remainingHeaders = visibleHeaders.slice(firstGroupCount);
+          remainingHeaders.forEach((header, index) => {
+            if (header === 'URL') {
+              topRowHeaders.push({label: 'ABC', headerClassName: 'ABC', colspan: 1});
+            } else if (header === 'Priority' || header === 'Due Date') {
+              if (index === remainingHeaders.findIndex(h => h === 'Priority')) {
+                topRowHeaders.push({label: 'Answer a question', colspan: 2, headerClassName: 'AAQ'});
+              }
+            } else if (header === 'Est. Value') {
+              topRowHeaders.push({label: 'Extract', colspan: 1, headerClassName: 'Extract'});
+            } else if (!['Priority', 'Due Date'].includes(header)) {
+              topRowHeaders.push({label: '', headerClassName: 'blank', colspan: 1});
+            }
+          });
+          
+          // Add extra columns and + button
+          if (extraHeaders.length > 0) {
+            extraHeaders.forEach(() => {
+              topRowHeaders.push({label: '', headerClassName: 'blank', colspan: 1});
+            });
+          }
+          topRowHeaders.push({label: '+', colspan: 1});
+          
+          return [
+            topRowHeaders,
+            [...visibleHeaders, ...extraHeaders, '+']
+          ];
+        })()}
         columns={getColumnSettings()}
         height={850}
         width="100%"
