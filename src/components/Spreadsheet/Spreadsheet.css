@@ -76,19 +76,60 @@ Custom css for the spreadsheet
   min-width: 80px;
   
 }
-/* Top headers */
+/* Top headers - Updated to match design */
 .handsontable-container .Q3{
-  background-color: #e2e2e2;
+  background-color: #f3f4f6 !important;
+  color: #6b7280 !important;
+  font-weight: 500 !important;
+  font-size: 12px !important;
+  border: 1px solid #e5e7eb !important;
+  text-align: center !important;
+  padding: 8px 12px !important;
 }
-.handsontable-container .ABC{
-  background-color: #d2e0d4;
 
+.handsontable-container .ABC{
+  background-color: #d1fae5 !important;
+  color: #065f46 !important;
+  font-weight: 500 !important;
+  font-size: 12px !important;
+  border: 1px solid #a7f3d0 !important;
+  text-align: center !important;
+  padding: 8px 12px !important;
 }
+
 .handsontable-container .AAQ{
-  background-color: #dccffc;
+  background-color: #e0e7ff !important;
+  color: #3730a3 !important;
+  font-weight: 500 !important;
+  font-size: 12px !important;
+  border: 1px solid #c7d2fe !important;
+  text-align: center !important;
+  padding: 8px 12px !important;
 }
+
 .handsontable-container .Extract{
-  background-color: #fac2af;
+  background-color: #fed7aa !important;
+  color: #c2410c !important;
+  font-weight: 500 !important;
+  font-size: 12px !important;
+  border: 1px solid #fdba74 !important;
+  text-align: center !important;
+  padding: 8px 12px !important;
+}
+
+.handsontable-container .blank{
+  background-color: transparent !important;
+  border: none !important;
+}
+
+.handsontable-container .add-column{
+  background-color: #f9fafb !important;
+  border: 1px dashed #d1d5db !important;
+  text-align: center !important;
+  cursor: pointer !important;
+  color: #6b7280 !important;
+  font-size: 18px !important;
+  font-weight: bold !important;
 }
 
 
@@ -276,3 +317,10 @@ Custom css for the spreadsheet
   user-select: none ;
 }
 
+.handsontable-container [data-lucide] {
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+  margin-right: 6px;
+  vertical-align: middle;
+}

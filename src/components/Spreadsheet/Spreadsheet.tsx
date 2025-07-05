@@ -8,7 +8,8 @@ import './styles.css';
 import './Spreadsheet.css'
 import { useRef, useCallback, useEffect, useState } from 'react';
 import { useData } from '../../hooks/useData';
-import { BriefcaseBusiness } from 'lucide-react';
+import {  BriefcaseBusiness, Calendar, CalendarDays,  CircleArrowDown, DollarSign,  Globe, User, Users } from 'lucide-react';
+import { createRoot } from 'react-dom/client';
 
 //fieldMapping
 
@@ -138,7 +139,6 @@ const Spreadsheet: React.FC<SpreadsheetProps> = ({ onDataChange, state: external
     return td;
   }, []);
 
-  //TODO: fix add btn
   const addColumnRenderer = useCallback((instance: any, td: HTMLElement, row: number, col: number, prop: any, value: any, cellProperties: any) => {
     Handsontable.renderers.TextRenderer.apply(this, [instance, td, row, col, prop, value, cellProperties]);
     
@@ -189,8 +189,8 @@ const Spreadsheet: React.FC<SpreadsheetProps> = ({ onDataChange, state: external
 
   const getColumnSettings = useCallback(() => {
     const baseSettings = [
-      { data: 0, type: 'text', width: 300, title: 'Job Request' }, // Job Request (Title)
-      { data: 1, type: 'text', width: 120, title: 'Submitted' }, // Submitted Date
+      { data: 0, type: 'text', width: 250, title: 'Job Request' }, // Job Request (Title)
+      { data: 1, type: 'text', width: 150, title: 'Submitted' }, // Submitted Date
       { 
         data: 2, 
         type: 'dropdown', 
@@ -204,7 +204,7 @@ const Spreadsheet: React.FC<SpreadsheetProps> = ({ onDataChange, state: external
         data: 4, 
         type: 'text', 
         renderer: urlRenderer,
-        width: 150,
+        width: 100,
         title: 'URL'
       }, // URL
       { data: 5, type: 'text', width: 150, title: 'Assigned' }, // Assigned
@@ -248,7 +248,53 @@ const Spreadsheet: React.FC<SpreadsheetProps> = ({ onDataChange, state: external
       addButtonSetting
     ];
   }, [extraColumns, statusRenderer, urlRenderer, priorityRenderer, addColumnRenderer, hiddenFields]);
+  
+const renderIconHeader = useCallback((text: string, container: HTMLElement) => {
+  // Clear container first
+  container.innerHTML = '';
+  
+  // Clean the text first
+  const cleanText = text.replace(/<[^>]*>/g, '').trim();
+  
+  // Debug: log the header text to see what we're working with
+  console.log('Header text:', `"${cleanText}"`);
+  
+  const getIcon = (headerText: string) => {
+    const lowerText = headerText.toLowerCase().trim();
+    if (lowerText.includes('job request') || lowerText.includes('job')) return <BriefcaseBusiness size={16} />;
+    if (lowerText === 'submitted' || lowerText.includes('submit')) return <CalendarDays size={16} />;
+    if (lowerText.includes('status')) return <CircleArrowDown size={16} />;
+    if (lowerText.includes('submitter')) return <User size={16} />;
+    if (lowerText.includes('url')) return <Globe size={16} />;
+    if (lowerText.includes('assigned')) return <Users size={16} />;
+    if (lowerText.includes('due date') || lowerText.includes('due')) return <Calendar size={16} />;
+    if (lowerText.includes('est. value') || lowerText.includes('value')) return <DollarSign size={16} />;
+    if (lowerText.includes('priority')) return <CircleArrowDown size={16} />;
+    return null;
+  };
 
+  const icon = getIcon(cleanText);
+  
+  const root = createRoot(container);
+  root.render(
+    <div className="flex items-center gap-2">
+      {icon}
+      <span>{cleanText}</span>
+    </div>
+  );
+}, []);
+
+useEffect(() => {
+  // Apply custom icons to headers after render
+  setTimeout(() => {
+    const headers = document.querySelectorAll('.handsontable-container .colHeader');
+    headers.forEach((header) => {
+      if (header.textContent && !header.textContent.includes('Q3') && !header.textContent.includes('ABC')) {
+        renderIconHeader(header.textContent, header as HTMLElement);
+      }
+    });
+  }, 100);
+}, [state.filteredData, hiddenFields]);
   return (
     <div className='h-[872px] min-w-full overflow-auto relative z-[1]'>
       <HotTable
@@ -262,42 +308,61 @@ const Spreadsheet: React.FC<SpreadsheetProps> = ({ onDataChange, state: external
           const extraHeaders = extraColumns.map((_, index) => `Custom ${index + 1}`);
           
           const topRowHeaders = [];
-          let currentIndex = 0;
+          const bottomRowHeaders = [];
           
-          // Q3 Financial Overview (covers first 4 visible columns)
-          const firstGroupCount = Math.min(4, visibleHeaders.length);
-          if (firstGroupCount > 0) {
-            topRowHeaders.push({label: 'Q3 Financial Overview', colspan: firstGroupCount, headerClassName: "Q3"});
-            currentIndex += firstGroupCount;
-          }
-          
-          // Add remaining headers based on what's visible
-          const remainingHeaders = visibleHeaders.slice(firstGroupCount);
-          remainingHeaders.forEach((header, index) => {
-            if (header === 'URL') {
-              topRowHeaders.push({label: 'ABC', headerClassName: 'ABC', colspan: 1});
+          // Build headers based on visible columns
+          visibleHeaders.forEach((header, index) => {
+            if (header === 'Job Request' || header === 'Submitted' || header === 'Status' || header === 'Submitter') {
+              if (index === 0) {
+                const q3Count = ['Job Request', 'Submitted', 'Status', 'Submitter'].filter(h => visibleHeaders.includes(h)).length;
+                topRowHeaders.push({label: '🔗 Q3 Financial Overview 🔄', colspan: q3Count, headerClassName: "Q3"});
+              }
+              if (header === 'Job Request') {
+                bottomRowHeaders.push('Job Request');
+              } else if (header === 'Submitted') {
+                bottomRowHeaders.push('Submitted');
+              } else if (header === 'Status') {
+                bottomRowHeaders.push('Status');
+              } else if (header === 'Submitter') {
+                bottomRowHeaders.push('Submitter');
+              }
+            } else if (header === 'URL') {
+              topRowHeaders.push({label: '', headerClassName: 'blank', colspan: 1});
+              bottomRowHeaders.push('URL');
+            } else if (header === 'Assigned') {
+              topRowHeaders.push({label: 'ABC ⋯', headerClassName: 'ABC', colspan: 1});
+              bottomRowHeaders.push('Assigned');
             } else if (header === 'Priority' || header === 'Due Date') {
-              if (index === remainingHeaders.findIndex(h => h === 'Priority')) {
-                topRowHeaders.push({label: 'Answer a question', colspan: 2, headerClassName: 'AAQ'});
+              if (header === 'Priority') {
+                const questionCount = ['Priority', 'Due Date'].filter(h => visibleHeaders.includes(h)).length;
+                topRowHeaders.push({label: 'Answer a question ⋯', colspan: questionCount, headerClassName: 'AAQ'});
+              }
+              if (header === 'Priority') {
+                bottomRowHeaders.push('Priority');
+              } else {
+                bottomRowHeaders.push('Due Date');
               }
             } else if (header === 'Est. Value') {
-              topRowHeaders.push({label: 'Extract', colspan: 1, headerClassName: 'Extract'});
-            } else if (!['Priority', 'Due Date'].includes(header)) {
-              topRowHeaders.push({label: '', headerClassName: 'blank', colspan: 1});
+              topRowHeaders.push({label: 'Extract ⋯', colspan: 1, headerClassName: 'Extract'});
+              bottomRowHeaders.push('Est. Value');
             }
           });
           
-          // Add extra columns and + button
+          // Add extra columns
           if (extraHeaders.length > 0) {
             extraHeaders.forEach(() => {
               topRowHeaders.push({label: '', headerClassName: 'blank', colspan: 1});
             });
+            bottomRowHeaders.push(...extraHeaders);
           }
-          topRowHeaders.push({label: '+', colspan: 1});
+          
+          // Add the + button
+          topRowHeaders.push({label: '+', colspan: 1, headerClassName: 'add-column'});
+          bottomRowHeaders.push('+');
           
           return [
             topRowHeaders,
-            [...visibleHeaders, ...extraHeaders, '+']
+            bottomRowHeaders
           ];
         })()}
         columns={getColumnSettings()}
