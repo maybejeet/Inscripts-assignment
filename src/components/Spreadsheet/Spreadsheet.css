@@ -38,6 +38,10 @@ Custom css for the spreadsheet
   vertical-align: middle;
   font-size: 13px;
   line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 0; /* This forces ellipsis to work */
 }
 .handsontable-container tr:first-child td{
   border-top:1px solid #f1f5f9 ;
@@ -51,7 +55,7 @@ Custom css for the spreadsheet
 .handsontable-container th,
 .handsontable-container .relative
  {
-  background-color: white;
+  background-color: #eeeeee;
   border-right: 1px solid #f1f5f9;
   border-bottom: 1px solid #f1f5f9;
   padding: 8px 12px;
@@ -79,37 +83,35 @@ Custom css for the spreadsheet
 /* Top headers - Updated to match design */
 .handsontable-container .Q3{
   background-color: #f3f4f6 !important;
-  color: #6b7280 !important;
+  color: #505450 !important;
   font-weight: 500 !important;
   font-size: 12px !important;
-  border: 1px solid #e5e7eb !important;
+  /* border: 1px solid #e5e7eb !important; */
   text-align: center !important;
   padding: 8px 12px !important;
 }
 
 .handsontable-container .ABC{
-  background-color: #d1fae5 !important;
-  color: #065f46 !important;
+  background-color: #d2e0d4 !important;
+  color: #505450 !important;
   font-weight: 500 !important;
   font-size: 12px !important;
-  border: 1px solid #a7f3d0 !important;
   text-align: center !important;
   padding: 8px 12px !important;
 }
 
 .handsontable-container .AAQ{
-  background-color: #e0e7ff !important;
-  color: #3730a3 !important;
+  background-color: #dccffc !important;
+  color: #463e59 !important;
   font-weight: 500 !important;
   font-size: 12px !important;
-  border: 1px solid #c7d2fe !important;
   text-align: center !important;
   padding: 8px 12px !important;
 }
 
 .handsontable-container .Extract{
-  background-color: #fed7aa !important;
-  color: #c2410c !important;
+  background-color: #fac2af !important;
+  color: #695149 !important;
   font-weight: 500 !important;
   font-size: 12px !important;
   border: 1px solid #fdba74 !important;
