@@ -4,18 +4,14 @@ import Handsontable from 'handsontable';
 import { registerAllModules } from 'handsontable/registry';
 import 'handsontable/styles/handsontable.css';
 import 'handsontable/styles/ht-theme-main.css';
-import './styles.css';
 import './Spreadsheet.css'
 import { useRef, useCallback, useEffect, useState } from 'react';
 import { useData } from '../../hooks/useData';
 import {  BriefcaseBusiness, Calendar, CalendarDays,  CircleArrowDown, DollarSign,  Globe, User, Users } from 'lucide-react';
 import { createRoot } from 'react-dom/client';
 
-//fieldMapping
-
 registerAllModules();
 
-// Define field mapping outside component to prevent re-creation
 const fieldMapping = {
   'Job Request': 0,
   'Submitted': 1,
@@ -107,7 +103,7 @@ const Spreadsheet: React.FC<SpreadsheetProps> = ({ onDataChange, state: external
   }, [state.filteredData, convertToHotData]);
 
 
-  const statusRenderer = useCallback((instance: any, td: HTMLElement, row: number, col: number, prop: any, value: any, cellProperties: any) => {
+  const statusRenderer = useCallback((instance:any, td: HTMLElement, row: number, col: number, prop: any, value: any, cellProperties: any) => {
     Handsontable.renderers.TextRenderer.apply(this, [instance, td, row, col, prop, value, cellProperties]);
     
     if (value) {
@@ -294,7 +290,7 @@ useEffect(() => {
       }
     });
   }, 100);
-}, [state.filteredData, hiddenFields]);
+}, [state.filteredData, hiddenFields,renderIconHeader]);
   return (
     <div className='h-[872px] min-w-full overflow-auto relative z-[1]'>
       <HotTable

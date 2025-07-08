@@ -1,8 +1,7 @@
 import { PlusIcon } from "lucide-react";
-
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
 
-export const TitleRow = (): JSX.Element => {
+export const TitleRow = () => {
   // Define tab data for easy mapping
   const tabItems = [
     { id: "all", label: "All Orders", active: true },

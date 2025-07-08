@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar'
 import { Badge } from '../ui/badge'
 
 
-const Topbar = (): JSX.Element => {
+const Topbar = () => {
   return (
     <>
     <header className=' w-full h-[56px]  pr-4 pt-4 pb-2 border border-b-1 border-[#EEEEEE] flex justify-between items-center'>

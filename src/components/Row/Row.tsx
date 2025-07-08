@@ -27,14 +27,40 @@ import {
   } from "../ui/dialog";
   import { useData } from "../../hooks/useData";
   
+  interface State {
+    data: DataItem[];
+    filters: {
+      status?: string;
+      priority?: string;
+      submitter?: string;
+    };
+  }
+  type DataItem = {
+    title: string;
+    submittedDate: string;
+    status: string;
+    submitter: string;
+    assigned: string;
+    priority: string;
+    dueDate: string;
+    estValue: string;
+    [key: string]: string;
+  };
+
+  type FilterObject = {
+    status?: string;
+    priority?: string;
+    submitter?: string;
+  };
+
   interface DataRowSectionProps {
     onSort: (key: string) => void;
-    onFilter: (filters: any) => void;
+    onFilter: (filters: FilterObject) => void;
     onToggleField: (field: string) => void;
     onExport: (format: 'csv' | 'json') => void;
     onAddNew: () => void;
     hiddenFields: string[];
-    state?: any;
+    state?: State;
   }
   
   export const Row = ({
@@ -45,7 +71,7 @@ import {
     onAddNew,
     hiddenFields,
     state
-  }: DataRowSectionProps): JSX.Element => {
+  }: DataRowSectionProps) => {
     const [showToolbar, setShowToolbar] = useState(true);
     const [filterDialogOpen, setFilterDialogOpen] = useState(false);
     const [shareDialogOpen, setShareDialogOpen] = useState(false);
@@ -108,7 +134,7 @@ import {
 
     // Get unique values from data for filter options
     const getUniqueValues = (key: keyof typeof currentState.data[0]) => {
-      return [...new Set(currentState.data.map(item => item[key]))].filter(Boolean);
+      return [...new Set(currentState.data.map(item  => item[key]))].filter(Boolean);
     };
 
     const statusOptions = getUniqueValues('status');

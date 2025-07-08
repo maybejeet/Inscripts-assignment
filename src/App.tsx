@@ -13,7 +13,6 @@ function App() {
     filterData,
     toggleFieldVisibility,
     exportData,
-    addNewRow,
   } = useData();
 
 
