@@ -1,5 +1,4 @@
 import { useState, useCallback } from 'react';
-
 export interface JobRequest {
   id: number;
   title: string;
