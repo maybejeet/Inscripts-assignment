@@ -136,7 +136,7 @@ Each job request contains:
 - **Reason**: Application complexity doesn't justify heavy state management libraries
 
 ### 3. **UI Library Selection**
-- **Choice**: Radix UI primitives + custom components
+- **Choice**: Shadcn + custom components
 - **Trade-off**: More setup work vs. full control over styling
 - **Reason**: Better accessibility, customization, and smaller bundle size than full UI frameworks
 
@@ -156,7 +156,7 @@ Each job request contains:
 - **Reason**: Significantly faster development server and build times
 
 ### 7. **Table Implementation**
-- **Choice**: Custom table with TanStack Table + Handsontable integration
+- **Choice**: Custom table with Handsontable integration
 - **Trade-off**: More complex setup vs. powerful features
 - **Reason**: Professional spreadsheet experience while maintaining React paradigms
 
