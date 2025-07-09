@@ -1,13 +1,12 @@
-
-import { HotTable } from '@handsontable/react';
+import React, { useRef, useCallback, useEffect, useState } from 'react';
+import { HotTable, HotTableClass } from '@handsontable/react';
 import Handsontable from 'handsontable';
 import { registerAllModules } from 'handsontable/registry';
 import 'handsontable/styles/handsontable.css';
 import 'handsontable/styles/ht-theme-main.css';
 import './Spreadsheet.css'
-import { useRef, useCallback, useEffect, useState } from 'react';
 import { useData } from '../../hooks/useData';
-import {  BriefcaseBusiness, Calendar, CalendarDays,  CircleArrowDown, DollarSign,  Globe, User, Users } from 'lucide-react';
+import { BriefcaseBusiness, Calendar, CalendarDays, CircleArrowDown, DollarSign, Globe, User, Users } from 'lucide-react';
 import { createRoot } from 'react-dom/client';
 
 registerAllModules();
@@ -22,7 +21,7 @@ const fieldMapping = {
   'Priority': 6,
   'Due Date': 7,
   'Est. Value': 8
-};
+} as const;
 
 interface JobRequest {
   id: number;
@@ -38,19 +37,19 @@ interface JobRequest {
   dueDate: string;
   estValue: string;
 }
+
 interface SpreadsheetProps {
   onDataChange?: (data: JobRequest[]) => void;
   state?: any;
   hiddenFields?: string[];
 }
 
-const Spreadsheet: React.FC<SpreadsheetProps> = ({ onDataChange, state: externalState, hiddenFields = [] }) => {
-  const hotTableRef = useRef<HotTable>(null);
+const Spreadsheet: React.FC<SpreadsheetProps> = ({ state: externalState, hiddenFields = [] }) => {
+  const hotTableRef = useRef<HotTableClass>(null);
   const internalData = useData();
   const state = externalState || internalData.state;
   const [hotData, setHotData] = useState<(string | number)[][]>([]);
   const [extraColumns, setExtraColumns] = useState<string[]>([]);
-
 
   const handleAddColumn = useCallback(() => {
     const newColumnName = `Custom ${extraColumns.length + 1}`;
@@ -76,7 +75,7 @@ const Spreadsheet: React.FC<SpreadsheetProps> = ({ onDataChange, state: external
       ];
       
       // Filter out hidden fields
-      const visibleFields = allFields.filter((field, index) => {
+      const visibleFields = allFields.filter((_field, index) => {
         const fieldName = Object.keys(fieldMapping).find(key => fieldMapping[key as keyof typeof fieldMapping] === index);
         return !hiddenFields.includes(fieldName || '');
       });
@@ -102,8 +101,7 @@ const Spreadsheet: React.FC<SpreadsheetProps> = ({ onDataChange, state: external
     setHotData(newHotData);
   }, [state.filteredData, convertToHotData]);
 
-
-  const statusRenderer = useCallback((instance:any, td: HTMLElement, row: number, col: number, prop: any, value: any, cellProperties: any) => {
+  const statusRenderer = useCallback((instance: Handsontable, td: HTMLTableCellElement, row: number, col: number, prop: string | number, value: any, cellProperties: Handsontable.CellProperties) => {
     Handsontable.renderers.TextRenderer.apply(this, [instance, td, row, col, prop, value, cellProperties]);
     
     if (value) {
@@ -114,7 +112,7 @@ const Spreadsheet: React.FC<SpreadsheetProps> = ({ onDataChange, state: external
     return td;
   }, []);
 
-  const priorityRenderer = useCallback((instance: any, td: HTMLElement, row: number, col: number, prop: any, value: any, cellProperties: any) => {
+  const priorityRenderer = useCallback((instance: Handsontable, td: HTMLTableCellElement, row: number, col: number, prop: string | number, value: any, cellProperties: Handsontable.CellProperties) => {
     Handsontable.renderers.TextRenderer.apply(this, [instance, td, row, col, prop, value, cellProperties]);
     
     if (value) {
@@ -125,7 +123,7 @@ const Spreadsheet: React.FC<SpreadsheetProps> = ({ onDataChange, state: external
     return td;
   }, []);
 
-   const urlRenderer = useCallback((instance: any, td: HTMLElement, row: number, col: number, prop: any, value: any, cellProperties: any) => {
+  const urlRenderer = useCallback((instance: Handsontable, td: HTMLTableCellElement, row: number, col: number, prop: string | number, value: any, cellProperties: Handsontable.CellProperties) => {
     Handsontable.renderers.TextRenderer.apply(this, [instance, td, row, col, prop, value, cellProperties]);
     
     if (value) {
@@ -135,7 +133,7 @@ const Spreadsheet: React.FC<SpreadsheetProps> = ({ onDataChange, state: external
     return td;
   }, []);
 
-  const addColumnRenderer = useCallback((instance: any, td: HTMLElement, row: number, col: number, prop: any, value: any, cellProperties: any) => {
+  const addColumnRenderer = useCallback((instance: Handsontable, td: HTMLTableCellElement, row: number, col: number, prop: string | number, value: any, cellProperties: Handsontable.CellProperties) => {
     Handsontable.renderers.TextRenderer.apply(this, [instance, td, row, col, prop, value, cellProperties]);
     
     if (row === 0) { // Only show (+) in header row
@@ -167,21 +165,17 @@ const Spreadsheet: React.FC<SpreadsheetProps> = ({ onDataChange, state: external
     return td;
   }, [handleAddColumn]);
 
-
-  const handleAfterChange = useCallback((changes: any, source: string) => {
+  const handleAfterChange = useCallback((changes: Handsontable.CellChange[] | null, source: Handsontable.ChangeSource) => {
     if (source === 'loadData') return;
     
     if (changes) {
-      changes.forEach(([row, col, oldValue, newValue]: [number, number, any, any]) => {
+      changes.forEach(([row, col, oldValue, newValue]) => {
         if (oldValue !== newValue) {
           console.log(`Cell at row ${row}, col ${col} changed from ${oldValue} to ${newValue}`);
         }
       });
     }
   }, []);
-
-
-
 
   const getColumnSettings = useCallback(() => {
     const baseSettings = [
@@ -217,22 +211,22 @@ const Spreadsheet: React.FC<SpreadsheetProps> = ({ onDataChange, state: external
     ];
 
     // Filter out hidden columns
-    const visibleSettings = baseSettings.filter((setting, index) => {
+    const visibleSettings = baseSettings.filter((_setting, index) => {
       const fieldName = Object.keys(fieldMapping).find(key => fieldMapping[key as keyof typeof fieldMapping] === index);
       return !hiddenFields.includes(fieldName || '');
     });
 
-    //Add settings for extra columns
-    const extraSettings = extraColumns.map((_, index) => ({
+    // Add settings for extra columns
+    const extraSettings = extraColumns.map((_column, index) => ({
       data: visibleSettings.length + index,
-      type: 'text',
+      type: 'text' as const,
       width: 120
     }));
 
     // Add (+) button column
     const addButtonSetting = {
       data: visibleSettings.length + extraColumns.length,
-      type: 'text',
+      type: 'text' as const,
       renderer: addColumnRenderer,
       readOnly: true,
       width: 50
@@ -245,66 +239,68 @@ const Spreadsheet: React.FC<SpreadsheetProps> = ({ onDataChange, state: external
     ];
   }, [extraColumns, statusRenderer, urlRenderer, priorityRenderer, addColumnRenderer, hiddenFields]);
   
-const renderIconHeader = useCallback((text: string, container: HTMLElement) => {
-  // Clear container first
-  container.innerHTML = '';
-  
-  // Clean the text first
-  const cleanText = text.replace(/<[^>]*>/g, '').trim();
-  
-  // Debug: log the header text to see what we're working with
-  console.log('Header text:', `"${cleanText}"`);
-  
-  const getIcon = (headerText: string) => {
-    const lowerText = headerText.toLowerCase().trim();
-    if (lowerText.includes('job request') || lowerText.includes('job')) return <BriefcaseBusiness size={16} />;
-    if (lowerText === 'submitted' || lowerText.includes('submit')) return <CalendarDays size={16} />;
-    if (lowerText.includes('status')) return <CircleArrowDown size={16} />;
-    if (lowerText.includes('submitter')) return <User size={16} />;
-    if (lowerText.includes('url')) return <Globe size={16} />;
-    if (lowerText.includes('assigned')) return <Users size={16} />;
-    if (lowerText.includes('due date') || lowerText.includes('due')) return <Calendar size={16} />;
-    if (lowerText.includes('est. value') || lowerText.includes('value')) return <DollarSign size={16} />;
-    if (lowerText.includes('priority')) return <CircleArrowDown size={16} />;
-    return null;
-  };
+  const renderIconHeader = useCallback((text: string, container: HTMLElement) => {
+    // Clear container first
+    container.innerHTML = '';
+    
+    // Clean the text first
+    const cleanText = text.replace(/<[^>]*>/g, '').trim();
+    
+    // Debug: log the header text to see what we're working with
+    console.log('Header text:', `"${cleanText}"`);
+    
+    const getIcon = (headerText: string) => {
+      const lowerText = headerText.toLowerCase().trim();
+      if (lowerText.includes('job request') || lowerText.includes('job')) return <BriefcaseBusiness size={16} />;
+      if (lowerText === 'submitted' || lowerText.includes('submit')) return <CalendarDays size={16} />;
+      if (lowerText.includes('status')) return <CircleArrowDown size={16} />;
+      if (lowerText.includes('submitter')) return <User size={16} />;
+      if (lowerText.includes('url')) return <Globe size={16} />;
+      if (lowerText.includes('assigned')) return <Users size={16} />;
+      if (lowerText.includes('due date') || lowerText.includes('due')) return <Calendar size={16} />;
+      if (lowerText.includes('est. value') || lowerText.includes('value')) return <DollarSign size={16} />;
+      if (lowerText.includes('priority')) return <CircleArrowDown size={16} />;
+      return null;
+    };
 
-  const icon = getIcon(cleanText);
-  
-  const root = createRoot(container);
-  root.render(
-    <div className="flex items-center gap-2">
-      {icon}
-      <span>{cleanText}</span>
-    </div>
-  );
-}, []);
+    const icon = getIcon(cleanText);
+    
+    const root = createRoot(container);
+    root.render(
+      <div className="flex items-center gap-2">
+        {icon}
+        <span>{cleanText}</span>
+      </div>
+    );
+  }, []);
 
-useEffect(() => {
-  // Apply custom icons to headers after render
-  setTimeout(() => {
-    const headers = document.querySelectorAll('.handsontable-container .colHeader');
-    headers.forEach((header) => {
-      if (header.textContent && !header.textContent.includes('Q3') && !header.textContent.includes('ABC')) {
-        renderIconHeader(header.textContent, header as HTMLElement);
-      }
-    });
-  }, 100);
-}, [state.filteredData, hiddenFields,renderIconHeader]);
+  useEffect(() => {
+    // Apply custom icons to headers after render
+    const timeout = setTimeout(() => {
+      const headers = document.querySelectorAll('.handsontable-container .colHeader');
+      headers.forEach((header) => {
+        if (header.textContent && !header.textContent.includes('Q3') && !header.textContent.includes('ABC')) {
+          renderIconHeader(header.textContent, header as HTMLElement);
+        }
+      });
+    }, 100);
+
+    return () => clearTimeout(timeout);
+  }, [state.filteredData, hiddenFields, renderIconHeader]);
+
   return (
     <div className='h-[872px] min-w-full overflow-auto relative z-[1]'>
       <HotTable
         ref={hotTableRef}
         data={hotData}
-        // colHeaders={columnHeaders}
         colHeaders={true}
         nestedHeaders={(() => {
           const allHeaders = ['Job Request', 'Submitted', 'Status', 'Submitter', 'URL', 'Assigned', 'Priority', 'Due Date', 'Est. Value'];
           const visibleHeaders = allHeaders.filter(header => !hiddenFields.includes(header));
-          const extraHeaders = extraColumns.map((_, index) => `Custom ${index + 1}`);
+          const extraHeaders = extraColumns.map((_column, index) => `Custom ${index + 1}`);
           
-          const topRowHeaders = [];
-          const bottomRowHeaders = [];
+          const topRowHeaders: any[] = [];
+          const bottomRowHeaders: string[] = [];
           
           // Build headers based on visible columns
           visibleHeaders.forEach((header, index) => {
