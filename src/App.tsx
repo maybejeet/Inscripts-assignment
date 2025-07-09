@@ -4,6 +4,7 @@ import Spreadsheet from './components/Spreadsheet/Spreadsheet';
 import { TitleRow } from './components/Title Row/TitleRow';
 import Topbar from './components/Topbar/Topbar'
 import { useData } from './hooks/useData'
+import { Toaster } from 'sonner';
 
 
 function App() {
@@ -78,6 +79,7 @@ function App() {
       />
       <Spreadsheet state={state} hiddenFields={state.hiddenFields} />
       <TitleRow onFilter={handleStatusFilter} currentFilter={state.filters.status} />
+      <Toaster/>
     </>
   )
 }
