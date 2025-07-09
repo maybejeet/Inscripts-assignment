@@ -11,6 +11,7 @@ function App() {
     state,
     sortData,
     filterData,
+    searchData,
     toggleFieldVisibility,
     exportData,
   } = useData();
@@ -30,6 +31,14 @@ function App() {
 
   const handleExport = (format: 'csv' | 'json') => {
     exportData(format);
+  };
+
+  const handleSearch = (query: string) => {
+    searchData(query);
+  };
+
+  const handleStatusFilter = (filters: { status?: string }) => {
+    filterData(filters);
   };
 
   const handleAddNew = () => {
@@ -54,7 +63,10 @@ function App() {
 
   return (
     <>
-      <Topbar/>
+      <Topbar 
+        onSearch={handleSearch}
+        searchQuery={state.searchQuery}
+      />
       <Row 
           onSort={handleSort}
           onFilter={handleFilter}
@@ -65,7 +77,7 @@ function App() {
           state={state}
       />
       <Spreadsheet state={state} hiddenFields={state.hiddenFields} />
-      <TitleRow/>
+      <TitleRow onFilter={handleStatusFilter} currentFilter={state.filters.status} />
     </>
   )
 }

@@ -5,7 +5,12 @@ import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar'
 import { Badge } from '../ui/badge'
 
 
-const Topbar = () => {
+interface TopbarProps {
+  onSearch: (query: string) => void;
+  searchQuery: string;
+}
+
+const Topbar: React.FC<TopbarProps> = ({ onSearch, searchQuery }) => {
   return (
     <>
     <header className=' w-full h-[56px]  pr-4 pt-4 pb-2 border border-b-1 border-[#EEEEEE] flex justify-between items-center'>
@@ -36,6 +41,8 @@ const Topbar = () => {
         <div className="flex items-center gap-2 p-3 bg-[#f6f6f6] rounded-md w-[175px] h-10">
           <SearchIcon className="w-5 h-5 text-[#757575]" />
           <Input
+            value={searchQuery}
+            onChange={(e) => onSearch(e.target.value)}
             placeholder="Search within sheet"
             className="border-0 p-0 h-auto text-[2px] font-paragraph-12-XS-regular-12-12 text-[#757575] focus-visible:ring-0 focus-visible:ring-offset-0 w-auto"
           />

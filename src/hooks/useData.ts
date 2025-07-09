@@ -26,6 +26,7 @@ export interface SpreadsheetState {
     priority?: string;
     submitter?: string;
   };
+  searchQuery: string;
   hiddenFields: string[];
   selectedRows: number[];
 }
@@ -109,6 +110,7 @@ export const useData = () => {
     filteredData: initialData,
     sortConfig: { key: null, direction: 'asc' },
     filters: {},
+    searchQuery: '',
     hiddenFields: [],
     selectedRows: [],
   });
@@ -137,16 +139,42 @@ export const useData = () => {
     });
   }, []);
 
+  const applyFilters = useCallback((data: JobRequest[], filters: Partial<SpreadsheetState['filters']>, searchQuery: string) => {
+    let filtered = data;
+    
+    // Apply text search across all fields
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(item => {
+        return (
+          item.title.toLowerCase().includes(query) ||
+          item.submittedDate.toLowerCase().includes(query) ||
+          item.status.toLowerCase().includes(query) ||
+          item.submitter.toLowerCase().includes(query) ||
+          item.url.toLowerCase().includes(query) ||
+          item.assigned.toLowerCase().includes(query) ||
+          item.priority.toLowerCase().includes(query) ||
+          item.dueDate.toLowerCase().includes(query) ||
+          item.estValue.toLowerCase().includes(query)
+        );
+      });
+    }
+    
+    // Apply column filters
+    filtered = filtered.filter(item => {
+      return Object.entries(filters).every(([key, value]) => {
+        if (!value) return true;
+        return item[key as keyof JobRequest].toString().toLowerCase().includes(value.toLowerCase());
+      });
+    });
+    
+    return filtered;
+  }, []);
+
   const filterData = useCallback((filters: Partial<SpreadsheetState['filters']>) => {
     setState(prevState => {
       const newFilters = { ...prevState.filters, ...filters };
-      
-      const filtered = prevState.data.filter(item => {
-        return Object.entries(newFilters).every(([key, value]) => {
-          if (!value) return true;
-          return item[key as keyof JobRequest].toString().toLowerCase().includes(value.toLowerCase());
-        });
-      });
+      const filtered = applyFilters(prevState.data, newFilters, prevState.searchQuery);
 
       return {
         ...prevState,
@@ -154,7 +182,19 @@ export const useData = () => {
         filteredData: filtered,
       };
     });
-  }, []);
+  }, [applyFilters]);
+
+  const searchData = useCallback((searchQuery: string) => {
+    setState(prevState => {
+      const filtered = applyFilters(prevState.data, prevState.filters, searchQuery);
+
+      return {
+        ...prevState,
+        searchQuery,
+        filteredData: filtered,
+      };
+    });
+  }, [applyFilters]);
 
   const toggleFieldVisibility = useCallback((fieldName: string) => {
     setState(prevState => ({
@@ -221,6 +261,7 @@ export const useData = () => {
     state,
     sortData,
     filterData,
+    searchData,
     toggleFieldVisibility,
     selectRow,
     addNewRow,
