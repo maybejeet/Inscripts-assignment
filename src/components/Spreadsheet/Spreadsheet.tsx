@@ -239,15 +239,10 @@ const Spreadsheet: React.FC<SpreadsheetProps> = ({ state: externalState, hiddenF
     ];
   }, [extraColumns, statusRenderer, urlRenderer, priorityRenderer, addColumnRenderer, hiddenFields]);
   
+  const rootsMap = useRef<Map<HTMLElement, any>>(new Map());
+  
   const renderIconHeader = useCallback((text: string, container: HTMLElement) => {
-    // Clear container first
-    container.innerHTML = '';
-    
-    // Clean the text first
-    const cleanText = text.replace(/<[^>]*>/g, '').trim();
-    
-    // Debug: log the header text to see what we're working with
-    console.log('Header text:', `"${cleanText}"`);
+    const cleanText = text.replace(/\<[^\>]*\>/g, '').trim();
     
     const getIcon = (headerText: string) => {
       const lowerText = headerText.toLowerCase().trim();
@@ -265,7 +260,14 @@ const Spreadsheet: React.FC<SpreadsheetProps> = ({ state: externalState, hiddenF
 
     const icon = getIcon(cleanText);
     
-    const root = createRoot(container);
+    // Get or create root for this container
+    let root = rootsMap.current.get(container);
+    if (!root) {
+      container.innerHTML = '';
+      root = createRoot(container);
+      rootsMap.current.set(container, root);
+    }
+    
     root.render(
       <div className="flex items-center gap-2">
         {icon}
@@ -287,6 +289,20 @@ const Spreadsheet: React.FC<SpreadsheetProps> = ({ state: externalState, hiddenF
 
     return () => clearTimeout(timeout);
   }, [state.filteredData, hiddenFields, renderIconHeader]);
+  
+  // Cleanup React roots on unmount
+  useEffect(() => {
+    return () => {
+      rootsMap.current.forEach((root) => {
+        try {
+          root.unmount();
+        } catch (e) {
+          // Ignore errors during cleanup
+        }
+      });
+      rootsMap.current.clear();
+    };
+  }, []);
 
   return (
     <div className='h-[872px] min-w-full overflow-auto relative z-[1]'>
